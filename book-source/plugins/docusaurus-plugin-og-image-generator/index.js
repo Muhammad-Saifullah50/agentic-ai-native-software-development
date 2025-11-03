@@ -134,6 +134,55 @@ async function generateOGImage({
         : description || "";
 
     // Create SVG using React-like JSX syntax
+    // Resolve system fonts cross-platform (macOS, Linux, Windows)
+    const candidates = [
+      {
+        name: "Sans",
+        weight: 400,
+        paths: [
+          "/Library/Fonts/Arial.ttf",
+          "/System/Library/Fonts/Supplemental/Arial.ttf",
+          "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+          "C:/Windows/Fonts/arial.ttf",
+        ],
+      },
+      {
+        name: "Sans",
+        weight: 700,
+        paths: [
+          "/Library/Fonts/Arial Bold.ttf",
+          "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+          "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+          "C:/Windows/Fonts/arialbd.ttf",
+        ],
+      },
+    ];
+
+    const resolvedFonts = candidates
+      .map((c) => {
+        const found = c.paths.find((p) => {
+          try {
+            return fs.existsSync(p);
+          } catch {
+            return false;
+          }
+        });
+        if (!found) return null;
+        return {
+          name: c.name,
+          data: fs.readFileSync(found),
+          weight: c.weight,
+          style: "normal",
+        };
+      })
+      .filter(Boolean);
+
+    if (!resolvedFonts.length) {
+      throw new Error(
+        "No suitable system fonts found for Satori (tried Arial/DejaVu/Windows Arial)."
+      );
+    }
+
     const svg = await satoriRenderer(
       {
         type: "div",
@@ -149,7 +198,7 @@ async function generateOGImage({
             backgroundImage:
               "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
             padding: 60,
-            fontFamily: "Arial, sans-serif",
+            fontFamily: "Sans",
             position: "relative",
           },
           children: [
@@ -267,24 +316,7 @@ async function generateOGImage({
       {
         width,
         height,
-        fonts: [
-          {
-            name: "Arial",
-            data: fs.readFileSync(
-              "/System/Library/Fonts/Supplemental/Arial.ttf"
-            ),
-            weight: 400,
-            style: "normal",
-          },
-          {
-            name: "Arial",
-            data: fs.readFileSync(
-              "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
-            ),
-            weight: 700,
-            style: "normal",
-          },
-        ],
+        fonts: resolvedFonts,
       }
     );
 
