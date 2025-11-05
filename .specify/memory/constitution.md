@@ -77,7 +77,7 @@ This constitution describes both:
 
 "AI Native Software Development: Colearning Agentic AI with Python and TypeScript – The AI & Spec Driven Way" is a technical book teaching AI-native software development methodology where specification-writing is the primary skill and AI agents handle implementation.
 
-**🔵 Future State Target**: 55 chapters across 13 parts
+**🔵 Future State Target**: 56 chapters across 13 parts
 **Current Implementation**: See `specs/book/chapter-index.md` for actual chapter counts and status
 
 This book demonstrates how to build production-ready AI systems by:
@@ -816,7 +816,7 @@ The book MUST follow a 13-part progressive structure building from AI-native min
 - **Parts 6-8**: Advanced, minimal scaffolding, realistic options
 - **Parts 9-13**: Professional, no artificial limits, production focus
 
-### Part-by-Part Breakdown (55 Chapters Total)
+### Part-by-Part Breakdown (56 Chapters Total)
 
 **Part 1: Introducing AI-Driven Development (4 chapters)**
 
@@ -830,11 +830,11 @@ The book MUST follow a 13-part progressive structure building from AI-native min
 - Scaffolding: High (tool literacy building)
 - Key Learning: Tool selection based on context and tradeoffs
 
-**Part 3: Prompt & Context Engineering (2 chapters)**
+**Part 3: Markdown, Prompt & Context Engineering (3 chapters)**
 
 - Problem Solved: How do I communicate effectively with AI?
 - Scaffolding: High (foundational communication skill)
-- Key Learning: Prompt engineering as core development competency
+- Key Learning: Markdown as AI's language, prompt engineering as core development competency
 
 **Part 4: Python: The Language of AI Agents (19 chapters)**
 
@@ -898,7 +898,7 @@ The book MUST follow a 13-part progressive structure building from AI-native min
 
 ### 🔵 Future State: Complete Book Structure
 
-**Total**: 55 chapters across 13 parts (aspirational target described above)
+**Total**: 56 chapters across 13 parts (aspirational target described above)
 
 ### Current Implementation Status
 
@@ -1145,7 +1145,7 @@ Three specialized agents manage the SDD loop phases (located in `.claude/agents/
 
 The book is complete and successful when:
 
-- [ ] All 55 chapters written and validated
+- [ ] All 56 chapters written and validated
 - [ ] All code examples tested and working (both Python and TypeScript)
 - [ ] All chapters follow Constitution principles (especially spec-first workflow)
 - [ ] Pedagogical flow coherent across all 13 parts

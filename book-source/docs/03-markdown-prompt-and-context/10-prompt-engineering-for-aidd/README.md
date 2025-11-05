@@ -1,9 +1,9 @@
 ---
-title: "Chapter 9: Prompt Engineering for AI-Driven Development"
-chapter: 9
+title: "Chapter 10: Prompt Engineering for AI-Driven Development"
+chapter: 10
 part: 3
 estimated_duration_minutes: 355
-sidebar_position: 9
+sidebar_position: 10
 
 # HIDDEN SKILLS METADATA (Institutional Integration Layer)
 # Not visible to students; enables competency assessment, accreditation alignment, and differentiation
@@ -85,7 +85,7 @@ cognitive_load:
 proficiency_progression: "A1 (Foundation) → A2 (Basic Application) → B1 (Intermediate Real-World Application)"
 ---
 
-# Chapter 9: Prompt Engineering for AI-Driven Development
+# Chapter 10: Prompt Engineering for AI-Driven Development
 
 You're about to learn something that will transform how you build software. It's not about memorizing syntax. It's not about becoming a programmer in the traditional sense. Instead, you're going to become an **AI orchestrator**—someone who thinks strategically, communicates precisely, and guides intelligent agents to build real applications.
 

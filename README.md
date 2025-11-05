@@ -31,7 +31,7 @@
 
 ## 🎯 Vision
 
-**AI Native Software Development** is a **46-chapter technical book, open specification, and development framework** that teaches you to build intelligent systems where AI is the core.
+**AI Native Software Development** is a **56-chapter technical book, open specification, and development framework** that teaches you to build intelligent systems where AI is the core.
 
 Rather than using AI to code faster, we teach you to **architect systems where intelligent agents are fundamental components** — applications that reason, learn, and collaborate. The learning journey progresses through three critical stages:
 

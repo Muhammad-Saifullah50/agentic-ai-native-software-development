@@ -1,6 +1,6 @@
 ---
 title: "Mastery Integration and Capstone — Systematize and Ship"
-chapter: 9
+chapter: 10
 lesson: 8
 duration_minutes: 40
 

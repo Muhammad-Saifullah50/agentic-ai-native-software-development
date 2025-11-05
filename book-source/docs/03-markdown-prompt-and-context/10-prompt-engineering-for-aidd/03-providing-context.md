@@ -1,6 +1,6 @@
 ---
 title: "Providing Technical Context - Project-Specific Code"
-chapter: 9
+chapter: 10
 lesson: 3
 duration_minutes: 45
 

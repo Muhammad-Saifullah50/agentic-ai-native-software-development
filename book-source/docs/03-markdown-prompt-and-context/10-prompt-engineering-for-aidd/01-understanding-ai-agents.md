@@ -1,6 +1,6 @@
 ---
 title: "Understanding AI Coding Agents as Collaborative Partners"
-chapter: 9
+chapter: 10
 lesson: 1
 duration_minutes: 25
 

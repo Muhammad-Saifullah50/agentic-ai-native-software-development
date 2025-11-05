@@ -1,6 +1,6 @@
 ---
 title: "Specifying Logic - Implementation Steps for Real Features"
-chapter: 9
+chapter: 10
 lesson: 4
 duration_minutes: 50
 

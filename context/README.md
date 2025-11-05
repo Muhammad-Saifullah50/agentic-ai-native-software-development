@@ -17,36 +17,37 @@ The book is geared towards teaching beginners how to program Modern Python, Type
 7. Bash Essentials for AI-Driven Development
 8. Git & GitHub for AI-Driven Development
 
-### Part 3: Prompt & Context Engineering (2 chapters)
-9. Prompt Engineering for AI-Driven Development
-10. Context Engineering for AI-Driven Development
+### Part 3: Markdown, Prompt & Context Engineering (3 chapters)
+9. Markdown: The Language of AI Communication
+10. Prompt Engineering for AI-Driven Development
+11. Context Engineering for AI-Driven Development
 
 ### Part 4: Python: The Language of AI Agents (19 chapters)
-11. Python UV: Fastest Python Package Manager
-12. Introduction to Python
-13. Data Types
-14. Operators, Keywords, and Variables
-15. Strings and Type Casting
-16. Control Flow and Loops
-17. Lists, Tuples, and Dictionary
-18. Set, Frozen Set, and GC
-19. Module and Functions
-20. Exception Handling
-21. IO and File Handling
-22. Math, Data Time Calender
-23. Object-Oriented Programming Part I
-24. Object-Oriented Programming Part II
-25. Meta Classes and Data Classes
-26. Pydantic and Generics
-27. Asyncio
-28. CPython and Gil
-29. Docstrings and MkDocs
+12. Python UV: Fastest Python Package Manager
+13. Introduction to Python
+14. Data Types
+15. Operators, Keywords, and Variables
+16. Strings and Type Casting
+17. Control Flow and Loops
+18. Lists, Tuples, and Dictionary
+19. Set, Frozen Set, and GC
+20. Module and Functions
+21. Exception Handling
+22. IO and File Handling
+23. Math, Data Time Calender
+24. Object-Oriented Programming Part I
+25. Object-Oriented Programming Part II
+26. Meta Classes and Data Classes
+27. Pydantic and Generics
+28. Asyncio
+29. CPython and Gil
+30. Docstrings and MkDocs
 
 ## Part 5: Spec Driven Development (4 chapters)
-30. Understanding Spec Driven Development
-31. Spec-Kit Plus
-32. Building Projects with Spec-Kit Plus
-33. The Tessl Vision: Spec-as-Source
+31. Understanding Spec Driven Development
+32. Spec-Kit Plus
+33. Building Projects with Spec-Kit Plus
+34. The Tessl Vision: Spec-as-Source
 
 ## Part 6: AI Native Software Development (3 chapters)
 

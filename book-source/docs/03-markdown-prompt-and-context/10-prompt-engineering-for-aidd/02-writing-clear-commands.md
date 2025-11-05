@@ -1,6 +1,6 @@
 ---
 title: "Writing Clear Commands - Your First Code Generation"
-chapter: 9
+chapter: 10
 lesson: 2
 part: 3
 duration_minutes: 40

@@ -1,6 +1,6 @@
 ---
 title: "Validating AI-Generated Code — Safety-First Habits"
-chapter: 9
+chapter: 10
 lesson: 5
 duration_minutes: 45
 
