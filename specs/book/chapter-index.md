@@ -72,7 +72,7 @@ Core language skills: production-quality Python
 | 27 | Pydantic and Generics | `27-pydantic-generics/` | 📋 Planned |
 | 28 | Asyncio | `28-asyncio/` | 📋 Planned |
 | 29 | CPython and GIL | `29-cpython-gil/` | 📋 Planned |
-| 30 | Docstrings and MkDocs | `30-docstrings-mkdocs/` | 📋 Planned |
+
 
 ---
 
