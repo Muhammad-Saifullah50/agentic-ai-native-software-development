@@ -226,15 +226,54 @@ Review your tasks and verify:
 
 ### Dependency Graph
 
-Can you draw your tasks?
+Here's how your calculator tasks depend on each other:
 
+```mermaid
+graph LR
+    T1["Task 1<br/>📝 Write RED test: add()"]
+    T2["Task 2<br/>✅ Implement add()"]
+    T3["Task 3<br/>📝 Write RED test: subtract()"]
+    T4["Task 4<br/>✅ Implement subtract()"]
+    T5["Task 5<br/>📝 Write RED test: multiply()"]
+    T6["Task 6<br/>✅ Implement multiply()"]
+    T7["Task 7<br/>📝 Write RED test: divide()"]
+    T8["Task 8<br/>✅ Implement divide()<br/>+ error handling"]
+    T9["Task 9<br/>📝 Write RED test: power()"]
+    T10["Task 10<br/>✅ Implement power()<br/>+ edge cases"]
+    T11["Task 11<br/>📚 Write documentation"]
+
+    T1 --> T2
+    T2 --> T3
+    T3 --> T4
+    T4 --> T5
+    T5 --> T6
+    T6 --> T7
+    T7 --> T8
+    T8 --> T9
+    T9 --> T10
+    T10 --> T11
+
+    style T1 fill:#ffebee,stroke:#c62828
+    style T3 fill:#ffebee,stroke:#c62828
+    style T5 fill:#ffebee,stroke:#c62828
+    style T7 fill:#ffebee,stroke:#c62828
+    style T9 fill:#ffebee,stroke:#c62828
+
+    style T2 fill:#e8f5e9,stroke:#2e7d32
+    style T4 fill:#e8f5e9,stroke:#2e7d32
+    style T6 fill:#e8f5e9,stroke:#2e7d32
+    style T8 fill:#e8f5e9,stroke:#2e7d32
+    style T10 fill:#e8f5e9,stroke:#2e7d32
+
+    style T11 fill:#e3f2fd,stroke:#1565c0
 ```
-Task 1 (add) → Task 2 (subtract) → Task 3 (multiply, divide)
-                                        ↓
-                                    Task 4 (power)
-                                        ↓
-                                Task 5+ (tests, docs)
-```
+
+**Legend:**
+- 🔴 Red tasks = Write failing tests first (TDD)
+- 🟢 Green tasks = Implement to make tests pass
+- 🔵 Blue tasks = Documentation and polish
+
+**Key Insight**: Tests MUST exist before implementation. You cannot implement Task 2 (add function) without Task 1 (add tests) being complete.
 
 ### Lineage Traceability
 

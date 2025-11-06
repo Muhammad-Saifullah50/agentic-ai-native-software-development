@@ -141,14 +141,36 @@ Horizontal intelligence captures decisions and learnings in a permanent, searcha
 
 You can optionally build Vertical intelligence at start of each project. This is like onboarding the specialized skilled workers in your team. It is how YOU work with AI orchestrators and specialized subagents:
 
-```
-You (Architect/Validator)
-  ↓
-AI Orchestrator (Main Collaborator)
-  ├─ Specification Subagent
-  ├─ Planning Subagent
-  ├─ Implementation Subagent
-  └─ Validation Subagent
+```mermaid
+graph TB
+    You["👤 You (Architect/Validator)<br/>Strategic Decisions & Quality Control"]
+
+    Orch["🤖 AI Orchestrator (Main Collaborator)<br/>Routes work to specialists"]
+
+    Spec["📝 Specification Subagent<br/>Writes clear requirements"]
+    Plan["🏗️ Planning Subagent<br/>Creates implementation plans"]
+    Impl["⚙️ Implementation Subagent<br/>Generates code + tests"]
+    Valid["✅ Validation Subagent<br/>Reviews quality"]
+
+    You -->|"What to build?"| Orch
+    Orch -->|"Delegates"| Spec
+    Orch -->|"Delegates"| Plan
+    Orch -->|"Delegates"| Impl
+    Orch -->|"Delegates"| Valid
+
+    Spec -->|"Returns spec"| Orch
+    Plan -->|"Returns plan"| Orch
+    Impl -->|"Returns code"| Orch
+    Valid -->|"Returns feedback"| Orch
+
+    Orch -->|"Review & Approve"| You
+
+    style You fill:#e1f5e1,stroke:#2d5016,stroke-width:3px
+    style Orch fill:#fff4e6,stroke:#d68910,stroke-width:2px
+    style Spec fill:#e3f2fd,stroke:#1565c0
+    style Plan fill:#e3f2fd,stroke:#1565c0
+    style Impl fill:#e3f2fd,stroke:#1565c0
+    style Valid fill:#e3f2fd,stroke:#1565c0
 ```
 
 **How Vertical Intelligence Works**:
@@ -187,9 +209,29 @@ Now let's install the actual Spec-Kit Plus framework. This is independent of you
 
 ### Installation Steps
 
-**Step 1: Install Spec-Kit Plus**
+**Step 1: Verify Python Version**
 
-Spec-Kit Plus is provided as a Python package:
+Spec-Kit Plus requires Python 3.12 or higher. Check your version first:
+
+```bash
+# Check Python version (must be 3.12+)
+python --version
+
+# If you see Python 3.11 or lower, upgrade Python first:
+# - macOS: brew install python@3.12
+# - Ubuntu: sudo apt install python3.12
+# - Windows: Download from python.org
+```
+
+**Expected Output:**
+```
+Python 3.12.0  ✓ (or higher)
+Python 3.11.5  ✗ (too old - upgrade needed)
+```
+
+**Step 2: Install Spec-Kit Plus**
+
+With Python 3.12+ confirmed, install Spec-Kit Plus:
 
 ```bash
 # Install the latest version
@@ -199,20 +241,37 @@ pip install specifyplus
 specifyplus --version
 ```
 
-**Step 2: Initialize Your First Project**
+**Step 3: Initialize Your First Project**
 
 ```bash
 # Create a new Spec-Kit Plus project
 specifyplus init calculator-project
 ```
 
-It will prompt to Select AI Tool and Terminal. You can choose between **Claude Code** or **Gemini CLI**. For terminal prefer bash - if you are on windows without wsl there is option to use powershell.
+**Interactive Prompts:**
 
-**Step 3: Navigate to the project**
+During initialization, you'll see these prompts:
+
+```
+? Select AI Tool:
+  > Claude Code
+    Gemini CLI
+
+? Select Terminal:
+  > bash
+    powershell (Windows only)
+```
+
+**Recommendations:**
+- **AI Tool**: Choose **Claude Code** (recommended for this book)
+- **Terminal**: Choose **bash** (or powershell if on Windows without WSL)
+
+**Step 4: Navigate to the project**
 ```bash
 cd calculator-project
 ```
-**Step 4: Verify Project Structure**
+
+**Step 5: Verify Project Structure**
 
 After initialization, you should see the following directory structure.
 
