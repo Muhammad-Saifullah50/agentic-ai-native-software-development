@@ -663,8 +663,18 @@ pre code {
         background-color: rgba(0, 0, 0, 0.5) !important;  /* Semi-transparent dark overlay */
     }
 
+    /* Light mode: Darker backdrop for better visibility and contrast */
+    [data-theme='light'] .navbar-sidebar__backdrop {
+        background-color: rgba(0, 0, 0, 0.9) !important;
+    }
+
     /* When sidebar is open (navbar--show class present), hide main content */
     .navbar--fixed-top.navbar-sidebar--show ~ .main-wrapper {
+        display: none !important;
+    }
+
+    /* Also hide footer when sidebar is open to prevent content overlap */
+    .navbar--fixed-top.navbar-sidebar--show ~ footer {
         display: none !important;
     }
 }
