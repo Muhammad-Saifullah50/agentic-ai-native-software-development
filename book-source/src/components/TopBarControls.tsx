@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
-import { Navbar, Nav, NavDropdown, ButtonGroup, Button } from 'react-bootstrap';
-import { FaSave, FaFolderOpen, FaFileExport, FaQuestionCircle, FaEdit, FaQuestion, FaPlay } from 'react-icons/fa';
+import { Save, FolderOpen, FileDown, HelpCircle, FileText, HelpCircleIcon, Play, Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTheme } from 'next-themes';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type PanelMode = 'explanation' | 'quiz' | 'simulation';
 
@@ -10,7 +17,8 @@ interface TopBarControlsProps {
 }
 
 const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMode }) => {
-  // Log component mount/unmount
+  const { theme, setTheme } = useTheme();
+
   useEffect(() => {
     console.log('TopBarControls mounted');
     return () => {
@@ -18,7 +26,6 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
     };
   }, []);
 
-  // Log prop changes
   useEffect(() => {
     console.log('TopBarControls currentMode changed to:', currentMode);
   }, [currentMode]);
@@ -28,52 +35,117 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
     onModeChange(mode);
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
-    <Navbar bg="light" expand="lg" className="mb-3">
-      <Navbar.Brand href="#home">AI-Native Playground</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="me-auto">
-          <Nav.Link href="#save">
-            <FaSave /> Save
-          </Nav.Link>
-          <Nav.Link href="#load">
-            <FaFolderOpen /> Load
-          </Nav.Link>
-          <NavDropdown title={<><FaFileExport /> Export</>} id="basic-nav-dropdown">
-            <NavDropdown.Item href="#export-png">PNG</NavDropdown.Item>
-            <NavDropdown.Item href="#export-json">JSON</NavDropdown.Item>
-          </NavDropdown>
-        </Nav>
-                <ButtonGroup aria-label="Mode Switcher" className="me-2">
-                  <Button
-                    variant={currentMode === 'explanation' ? 'dark' : 'outline-secondary'}
-                    title="Explanation Mode"
-                    onClick={() => handleModeButtonClick('explanation')}
-                  >
-                    <FaEdit /> Explanation
-                  </Button>
-                  <Button
-                    variant={currentMode === 'quiz' ? 'dark' : 'outline-secondary'}
-                    title="Quiz Mode"
-                    onClick={() => handleModeButtonClick('quiz')}
-                  >
-                    <FaQuestion /> Quiz
-                  </Button>
-                  <Button
-                    variant={currentMode === 'simulation' ? 'dark' : 'outline-secondary'}
-                    title="Simulation Mode"
-                    onClick={() => handleModeButtonClick('simulation')}
-                  >
-                    <FaPlay /> Simulate
-                  </Button>
-                </ButtonGroup>        <Nav>
-          <Nav.Link href="#help">
-            <FaQuestionCircle /> Help
-          </Nav.Link>
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
+    <nav className="bg-card border-b border-border shadow-sm mb-6 animate-fade-in">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          {/* Brand */}
+          <h1 className="text-xl font-bold text-foreground">
+            AI-Native Playground
+          </h1>
+
+          {/* Navigation Links */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="gap-2 hover:bg-secondary transition-colors"
+            >
+              <Save className="h-4 w-4" />
+              Save
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="gap-2 hover:bg-secondary transition-colors"
+            >
+              <FolderOpen className="h-4 w-4" />
+              Load
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="gap-2 hover:bg-secondary transition-colors"
+                >
+                  <FileDown className="h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-popover border-border">
+                <DropdownMenuItem className="cursor-pointer hover:bg-secondary">
+                  Export as PNG
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer hover:bg-secondary">
+                  Export as JSON
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-2" role="group" aria-label="Mode Switcher">
+            <Button
+              variant={currentMode === 'explanation' ? 'default' : 'outline'}
+              size="sm"
+              title="Explanation Mode"
+              onClick={() => handleModeButtonClick('explanation')}
+              className="gap-2 transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Explanation
+            </Button>
+            <Button
+              variant={currentMode === 'quiz' ? 'default' : 'outline'}
+              size="sm"
+              title="Quiz Mode"
+              onClick={() => handleModeButtonClick('quiz')}
+              className="gap-2 transition-colors"
+            >
+              <HelpCircleIcon className="h-4 w-4" />
+              Quiz
+            </Button>
+            <Button
+              variant={currentMode === 'simulation' ? 'default' : 'outline'}
+              size="sm"
+              title="Simulation Mode"
+              onClick={() => handleModeButtonClick('simulation')}
+              className="gap-2 transition-colors"
+            >
+              <Play className="h-4 w-4" />
+              Simulate
+            </Button>
+          </div>
+
+          {/* Theme Toggle & Help */}
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={toggleTheme}
+              className="gap-2 hover:bg-secondary transition-colors"
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="gap-2 hover:bg-secondary transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+              Help
+            </Button>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 

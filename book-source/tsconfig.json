@@ -1,11 +1,18 @@
 {
   // This file is not used in compilation. It is here just for a nice editor experience.
   "extends": "@docusaurus/tsconfig",
+  
+  "jsx": "react-jsx", 
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     }
   },
-  "exclude": [".docusaurus", "build"]
+  "exclude": [
+    ".docusaurus",
+    "build"
+  ]
 }

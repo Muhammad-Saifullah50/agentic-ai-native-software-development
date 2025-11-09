@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Button, InputGroup } from 'react-bootstrap';
-import { FaMagic } from 'react-icons/fa';
+import { Wand2 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface NaturalLanguageEditBoxProps {
   onNaturalLanguageCommand: (command: string) => void;
@@ -9,7 +11,6 @@ interface NaturalLanguageEditBoxProps {
 const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNaturalLanguageCommand }) => {
   const [command, setCommand] = useState('');
 
-  // Log component mount/unmount
   useEffect(() => {
     console.log('NaturalLanguageEditBox mounted');
     return () => {
@@ -27,26 +28,33 @@ const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNatur
   };
 
   return (
-    <Card className="mb-3">
-      <Card.Header as="h5">Natural Language Workflow Editor</Card.Header>
-      <Card.Body>
-        <Form onSubmit={handleSubmit}>
-          <InputGroup className="mb-2">
-            <Form.Control
+    <Card className="shadow-lg border-border/50 bg-card animate-fade-in">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-semibold">Natural Language Workflow Editor</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="flex gap-2">
+            <Input
               type="text"
               placeholder="e.g., 'Add a memory agent before the classifier'"
               value={command}
               onChange={(e) => setCommand(e.target.value)}
+              className="flex-1 bg-background border-border focus:ring-2 focus:ring-primary"
             />
-            <Button variant="primary" type="submit">
-              <FaMagic /> Apply
+            <Button 
+              type="submit" 
+              className="gap-2 bg-primary hover:bg-primary/90 transition-colors"
+            >
+              <Wand2 className="h-4 w-4" />
+              Apply
             </Button>
-          </InputGroup>
-        </Form>
-        <small className="text-muted mt-2 d-block">
-          Type commands to modify the workflow using natural language.
-        </small>
-      </Card.Body>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Type commands to modify the workflow using natural language.
+          </p>
+        </form>
+      </CardContent>
     </Card>
   );
 };
