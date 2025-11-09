@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: AI-Native Scenario Simulator API
+  version: 1.0.0
+paths:
+  /simulate:
+    post:
+      summary: Simulate a scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scenario:
+                  type: string
+      responses:
+        '200':
+          description: Simulation started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simulation_id:
+                    type: string
+  /scenarios:
+    get:
+      summary: Get all scenarios
+      responses:
+        '200':
+          description: A list of scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    scenario_text:
+                      type: string
+  /ws/{simulation_id}:
+    get:
+      summary: Websocket endpoint for simulation updates
+      parameters:
+        - name: simulation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '101':
+          description: Switching protocols to websocket

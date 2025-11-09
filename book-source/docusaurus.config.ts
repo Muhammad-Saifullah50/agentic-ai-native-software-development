@@ -1,6 +1,7 @@
 import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
+import webpack from "webpack"; // Import webpack
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -120,6 +121,15 @@ const config: Config = {
                 "@": path.resolve(__dirname, "src"),
               },
             },
+            plugins: [
+              new webpack.DefinePlugin({
+                'process.env.REACT_APP_BACKEND_API_URL': JSON.stringify(process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:8000'),
+                'process.env.REACT_APP_BACKEND_WS_URL': JSON.stringify(process.env.REACT_APP_BACKEND_WS_URL || 'ws://localhost:8000'),
+              }),
+              new webpack.ProvidePlugin({
+                React: 'react',
+              }),
+            ],
           };
         },
       };
@@ -188,11 +198,11 @@ const config: Config = {
           label: 'Playground',
           position: 'right',
         },
-        {
-          href: "https://github.com/panaversity/ai-native-software-development",
-          label: "GitHub",
-          position: "right",
-        },
+        // {
+        //   href: "https://github.com/panaversity/ai-native-software-development",
+        //   label: "GitHub",
+        //   position: "right",
+        // },
       ],
     },
     footer: {

@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: AI-Native Scenario Playground Frontend API Contracts
+  version: 1.0.0
+  description: API contracts for the AI-Native Scenario Playground frontend to interact with the 002-scenario-backend.
+
+servers:
+  - url: http://localhost:8000
+    description: Local 002-scenario-backend server
+
+paths:
+  /simulate:
+    post:
+      summary: Submit a scenario for simulation
+      operationId: submitScenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scenario_text:
+                  type: string
+                  description: The natural language description of the scenario.
+              required:
+                - scenario_text
+      responses:
+        '200':
+          description: Simulation initiated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simulation_id:
+                    type: string
+                    description: Unique ID for the initiated simulation.
+                  message:
+                    type: string
+                    description: Confirmation message.
+        '400':
+          description: Invalid scenario input.
+        '500':
+          description: Internal server error during simulation initiation.
+
+  /scenarios:
+    get:
+      summary: Retrieve all saved scenarios
+      operationId: getScenarios
+      responses:
+        '200':
+          description: A list of saved scenarios.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    scenario_text:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                  required:
+                    - id
+                    - scenario_text
+                    - created_at
+        '500':
+          description: Internal server error during retrieval.
+
+# WebSocket endpoint is described conceptually as OpenAPI does not directly support WebSocket definitions.
+# The frontend will connect to ws://localhost:8000/ws/{simulation_id}
+# and expect to receive SimulationEvent objects.
+# See backend/src/models/api.py for SimulationEvent schema.
