@@ -28,7 +28,7 @@ const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
   }, []);
 
   return (
-    <Card className="shadow-lg border-border/50 bg-card animate-fade-in bg-white">
+    <Card className="shadow-lg border-border/50 bg-card animate-fade-in">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">Graph Edit Toolbar</CardTitle>
       </CardHeader>
