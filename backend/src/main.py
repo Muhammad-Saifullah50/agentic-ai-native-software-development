@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware # Import CORSMiddleware
 from src.api import simulate
 from src.api import scenarios
 from src.api import websockets
+from src.api import review
 from src.logging_config import setup_logging
 from src.error_handling import validation_exception_handler, generic_exception_handler
 from loguru import logger
@@ -29,6 +30,7 @@ app.add_exception_handler(Exception, generic_exception_handler)
 app.include_router(simulate.router)
 app.include_router(scenarios.router)
 app.include_router(websockets.router)
+app.include_router(review.router)
 
 @app.get("/")
 async def root():

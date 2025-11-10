@@ -5,12 +5,12 @@ import NaturalLanguageEditBox from '@/components/NaturalLanguageEditBox';
 import ReflectionExplanationSidePanel from '@/components/ReflectionExplanationSidePanel';
 import ScenarioFeedbackScoring from '@/components/ScenarioFeedbackScoring';
 import ScenarioInputPanel from '@/components/ScenarioInputPanel';
-import SimulationPanel from '@/components/SimulationPanel';
 import TopBarControls from '@/components/TopBarControls';
 import SemanticCanvas from '@/components/SemanticCanvas';
 import { Node, Edge } from '@/types/graph';
 import { webSocketService } from '../services/websocketService';
-import { editWorkflow } from '../services/apiService';
+import { editWorkflow, getAIFeedback } from '../services/apiService';
+import { v4 as uuidv4 } from 'uuid';
 
 type PanelMode = 'explanation' | 'quiz' | 'simulation';
 
@@ -28,6 +28,7 @@ const Playground = () => {
   const [missingComponents, setMissingComponents] = useState<string[]>([]);
   const [suggestedImprovements, setSuggestedImprovements] = useState<string[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
+  const [showFeedbackButton, setShowFeedbackButton] = useState(false);
 
   
   const handleWorkflowGenerated = (generatedNodes: Node[], generatedEdges: Edge[], newSimulationId: string) => {
@@ -51,16 +52,38 @@ const Playground = () => {
     setSelectedElement(edge);
   };
 
-  const handleAddNode = () => {
-    console.log('Add Node clicked');
+  const handleAddNode = (type: 'agent' | 'tool', name: string) => {
+    const newNode: Node = {
+      id: uuidv4(),
+      type,
+      label: name,
+      zone: type === 'agent' ? 'reasoning' : 'action',
+      metadata: {
+        description: '',
+        principles: [],
+        reflection_points: [],
+      },
+    };
+    setNodes((prevNodes) => [...prevNodes, newNode]);
   };
 
   const handleDeleteNode = () => {
     console.log('Delete Node clicked');
   };
 
-  const handleAddConnection = () => {
-    console.log('Add Connection clicked');
+  const handleAddConnection = (connection: any) => { // Change type to any to access source and target
+    const newEdge: Edge = {
+      id: `${connection.source}-${connection.target}`,
+      source: connection.source,
+      target: connection.target,
+      label: "uses", // Default label for new connections
+      metadata: {
+        explanation: "uses",
+        principle_reference: "",
+      },
+    };
+    setEdges((prevEdges) => [...prevEdges, newEdge]);
+    setShowFeedbackButton(true);
   };
 
   const handleRemoveConnection = () => {
@@ -73,6 +96,23 @@ const Playground = () => {
 
   const handleRedo = () => {
     console.log('Redo clicked');
+  };
+
+  const handleGetAIFeedback = async () => {
+    if (!simulationId) {
+      setGlobalError('Cannot get AI feedback without a simulation ID.');
+      return;
+    }
+    try {
+      const feedback = await getAIFeedback(simulationId, nodes, edges);
+      setScore(feedback.score);
+      setViolatedPrinciples(feedback.violatedPrinciples);
+      setMissingComponents(feedback.missingComponents);
+      setSuggestedImprovements(feedback.suggestedImprovements);
+      setSummary(feedback.summary);
+    } catch (error: any) {
+      setGlobalError(error.message);
+    }
   };
 
   const handleNaturalLanguageCommand = async (command: string) => {
@@ -204,14 +244,16 @@ const Playground = () => {
       
       <div className="container mx-auto px-4 pb-8 flex-grow flex flex-col">
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-          <div className="mb-4 lg:mb-0">
+          <div className="mb-4 lg:mb-0 w-full">
             <GraphEditToolbar
-              onAddNode={() => console.log('Add node')}
+              onAddNode={handleAddNode}
               onDeleteNode={() => console.log('Delete node')}
-              onAddConnection={() => console.log('Add connection')}
+              onAddConnection={handleAddConnection}
               onRemoveConnection={() => console.log('Remove connection')}
               onUndo={() => console.log('Undo')}
               onRedo={() => console.log('Redo')}
+              onGetAIFeedback={handleGetAIFeedback}
+              isFeedbackDisabled={!showFeedbackButton}
             />
           </div>
          
@@ -237,6 +279,7 @@ const Playground = () => {
               edges={edges}
               onNodeClick={handleNodeClick}
               onEdgeClick={handleEdgeClick}
+              onConnect={handleAddConnection}
             />
           </div>
         </div>
@@ -250,13 +293,10 @@ const Playground = () => {
 
           <ScenarioFeedbackScoring
             score={score}
-            violatedPrinciples={score !== null ? ['Insufficient error handling in perception layer'] : []}
-            missingComponents={score !== null ? ['Memory component for context retention'] : []}
-            suggestedImprovements={score !== null ? [
-              'Add validation layer before processing',
-              'Implement feedback loop for continuous learning'
-            ] : []}
-            summary={score !== null ? 'Good overall design with room for improvement in error handling and memory management.' : null}
+            violatedPrinciples={violatedPrinciples}
+            missingComponents={missingComponents}
+            suggestedImprovements={suggestedImprovements}
+            summary={summary}
           />
         </div>
       </div>

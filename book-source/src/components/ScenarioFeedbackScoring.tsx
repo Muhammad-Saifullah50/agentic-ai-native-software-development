@@ -59,7 +59,7 @@ const ScenarioFeedbackScoring: React.FC<ScenarioFeedbackScoringProps> = ({
               </>
             )}
 
-            {violatedPrinciples.length > 0 && (
+            {violatedPrinciples && violatedPrinciples.length > 0 && (
               <>
                 <Separator />
                 <div className="space-y-2">
@@ -78,7 +78,7 @@ const ScenarioFeedbackScoring: React.FC<ScenarioFeedbackScoringProps> = ({
               </>
             )}
 
-            {missingComponents.length > 0 && (
+            {missingComponents && missingComponents.length > 0 && (
               <>
                 <Separator />
                 <div className="space-y-2">
@@ -97,7 +97,7 @@ const ScenarioFeedbackScoring: React.FC<ScenarioFeedbackScoringProps> = ({
               </>
             )}
 
-            {suggestedImprovements.length > 0 && (
+            {suggestedImprovements && suggestedImprovements.length > 0 && (
               <>
                 <Separator />
                 <div className="space-y-2">

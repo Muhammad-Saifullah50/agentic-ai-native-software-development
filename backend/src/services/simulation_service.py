@@ -1,14 +1,15 @@
 import datetime
 import json
 from loguru import logger
+from typing import List
 
 from agents import Runner
-from src.models.api import AgentNetworkArchitecture, SimulationEvent, Connection
+from src.models.api import AgentNetworkArchitecture, SimulationEvent, Connection, Node, Agent, Tool, ReviewFeedback
 from src.sim_agents.scenario_interpreter import scenario_interpreter_agent
 from src.sim_agents.architecture_planner import architecture_planner_agent
 from src.sim_agents.architecture_editor import architecture_editor_agent
-from src.sim_agents.failure_simulation import failure_simulation_agent
-from src.sim_agents.observability_narrative import observability_narrative_agent
+from src.sim_agents.simulation_reviewer_agent import simulation_reviewer_agent
+
 
 from src.models.gemini import config
 from src.websocket_manager import manager
@@ -86,7 +87,7 @@ async def run_simulation(
     for agent in agent_network_architecture.agents:
         for tool_name in agent.tools:
             agent_network_architecture.connections.append(
-                Connection(source=agent.id, target=tool_name, data_format="uses")
+                Connection(source=agent.id, target=tool_name, label="uses")
             )
 
     ev = SimulationEvent(
@@ -100,81 +101,7 @@ async def run_simulation(
 
     logger.info("Step 2 completed.")
 
-    # --------------------------------------------
-    # ✅ STEP 3 — Failure Simulation
-    # --------------------------------------------
-    logger.info("Step 3: Simulating failure modes…")
 
-    failure_input = (
-        f"Scenario text:\n{scenario_text}\n\n"
-        f"Agent network architecture:\n{agent_network_architecture}"
-    )
-
-    failure_result = await Runner.run(
-        starting_agent=failure_simulation_agent,
-        input=failure_input,
-        context="Simulate realistic failure modes and breakdown points.",
-        run_config=config
-    )
-
-    failure_modes = failure_result.final_output
-
-    ev = SimulationEvent(
-        simulation_id=simulation_id,
-        timestamp=datetime.datetime.now().isoformat(),
-        event_type="failure_modes_identified",
-        payload={"failure_modes": failure_modes}
-    )
-    simulation_events.append(ev)
-    await manager.broadcast(ev.model_dump_json())
-
-    logger.info("Step 3 completed.")
-
-   # --------------------------------------------
-    # ✅ STEP 4 — Observability Narrative
-    # --------------------------------------------
-    logger.info("Step 4: Generating observability narrative…")
-
-    def safe_serialize(obj):
-        if hasattr(obj, "model_dump"):
-            return obj.model_dump()
-        if isinstance(obj, (list, tuple)):
-            return [safe_serialize(i) for i in obj]
-        if isinstance(obj, dict):
-            return {k: safe_serialize(v) for k, v in obj.items()}
-        return obj  # fallback: primitives
-
-    events_text = "\n\n".join([
-        json.dumps(
-            {
-                "event_type": event.event_type,
-                "payload": safe_serialize(event.payload)
-            },
-            indent=2
-        )
-        for event in simulation_events
-    ])
-
-    # ✅ Missing part — run narrative agent!
-    observability_result = await Runner.run(
-        starting_agent=observability_narrative_agent,
-        input=events_text,
-        context="Generate a detailed observability narrative from the simulation events.",
-        run_config=config
-    )
-
-    observability_narrative = observability_result.final_output
-
-    ev = SimulationEvent(
-        simulation_id=simulation_id,
-        timestamp=datetime.datetime.now().isoformat(),
-        event_type="observability_narrative_generated",
-        payload={"observability_narrative": observability_narrative}
-    )
-    simulation_events.append(ev)
-    await manager.broadcast(ev.model_dump_json())
-
-    logger.info("Step 4 completed.")
 
     # --------------------------------------------
     # ✅ FINAL EVENT
@@ -220,7 +147,7 @@ Command: {command}
     for agent in new_architecture.agents:
         for tool_name in agent.tools:
             new_architecture.connections.append(
-                Connection(source=agent.id, target=tool_name, data_format="uses")
+                Connection(source=agent.id, target=tool_name, label="uses")
             )
 
     ev = SimulationEvent(
@@ -233,3 +160,40 @@ Command: {command}
 
     logger.info(f"Simulation {simulation_id} edited successfully.")
     return new_architecture
+
+async def review_simulation(simulation_id: str, nodes: List[Node], edges: List[Connection]) -> ReviewFeedback:
+    logger.info(f"Reviewing simulation {simulation_id} with {len(nodes)} nodes and {len(edges)} edges.")
+
+    # Construct AgentNetworkArchitecture from nodes and edges
+    agents = []
+    tools = []
+    for node in nodes:
+        if node.type == "agent":
+            agents.append(Agent(id=node.id, name=node.label, role=node.metadata.get("description", ""), tools=[], dependencies=[]))
+        elif node.type == "tool":
+            tools.append(Tool(name=node.label, description=node.metadata.get("description", "")))
+
+    # Map frontend Edge to backend Connection
+    backend_connections = []
+    for edge in edges:
+        backend_connections.append(Connection(source=edge.source, target=edge.target, label=edge.label))
+
+    architecture = AgentNetworkArchitecture(
+        agents=agents,
+        tools=tools,
+        connections=backend_connections,
+    )
+
+    review_input = json.dumps(architecture.model_dump(), indent=2)
+
+    review_result = await Runner.run(
+        starting_agent=simulation_reviewer_agent,
+        input=review_input,
+        context="Review the provided agent network architecture.",
+        run_config=config,
+    )
+
+    review_feedback = review_result.final_output
+    logger.info(f"Review feedback from agent: {review_feedback}") # Add this line
+    return review_feedback
+

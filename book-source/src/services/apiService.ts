@@ -73,9 +73,9 @@ export const simulateScenario = async (simulationId: string, scenarioText: strin
         id: `${connection.source}-${connection.target}`, // Generate unique ID
         source: connection.source,
         target: connection.target,
-        label: connection.data_format,
+        label: connection.label, // Changed from data_format to label
         metadata: {
-          explanation: connection.data_format,
+          explanation: connection.label, // Changed from data_format to label
           principle_reference: "",
         },
       });
@@ -171,9 +171,9 @@ export const editWorkflow = async (simulationId: string, command: string): Promi
         id: `${connection.source}-${connection.target}`, // Generate unique ID
         source: connection.source,
         target: connection.target,
-        label: connection.data_format,
+        label: connection.label, // Changed from data_format to label
         metadata: {
-          explanation: connection.data_format,
+          explanation: connection.label, // Changed from data_format to label
           principle_reference: "",
         },
       });
@@ -186,6 +186,31 @@ export const editWorkflow = async (simulationId: string, command: string): Promi
     };
   } catch (error: any) {
     console.error('Error editing workflow:', error);
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error('Network error: Could not connect to the backend server. Please ensure the server is running.');
+    }
+    throw error;
+  }
+};
+
+export const getAIFeedback = async (simulationId: string, nodes: Node[], edges: Edge[]): Promise<any> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/simulations/${simulationId}/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nodes, edges }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `Server error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error: any) {
+    console.error('Error getting AI feedback:', error);
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
       throw new Error('Network error: Could not connect to the backend server. Please ensure the server is running.');
     }

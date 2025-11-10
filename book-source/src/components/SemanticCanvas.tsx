@@ -36,6 +36,7 @@ interface SemanticCanvasProps {
   edges?: Edge[];
   onNodeClick?: (node: Node) => void;
   onEdgeClick?: (edge: Edge) => void;
+  onConnect?: (connection: Edge) => void;
 }
 
 const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
@@ -43,6 +44,7 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
   edges = [],
   onNodeClick,
   onEdgeClick,
+  onConnect,
 }) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -147,9 +149,15 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
     [],
   );
 
-  const onConnect = useCallback(
-    (params) => setRfEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [],
+  const handleConnect = useCallback(
+    (params) => {
+      console.log('onConnect called with:', params);
+      if (onConnect) {
+        onConnect(params);
+      }
+      setRfEdges((eds) => addEdge(params, eds));
+    },
+    [onConnect],
   );
 
   useEffect(() => {
@@ -247,7 +255,7 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
               edges={rfEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
+              onConnect={handleConnect}
               onNodeClick={handleNodeClick}
               onEdgeClick={handleEdgeClick}
               onNodeMouseEnter={handleNodeMouseEnter}

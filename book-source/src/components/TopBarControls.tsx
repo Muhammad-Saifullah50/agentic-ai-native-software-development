@@ -49,25 +49,16 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
           </h1>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="gap-2 hover:bg-secondary transition-colors"
-            >
-              <Save className="h-4 w-4" />
-              Save
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="gap-2 hover:bg-secondary transition-colors"
-            >
-              <FolderOpen className="h-4 w-4" />
-              Load
-            </Button>
+           
+           
             
-            <DropdownMenu>
+           
+
+        
+
+          {/* Theme Toggle & Help */}
+          <div className="flex items-center gap-2">
+             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
@@ -87,44 +78,7 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-
-          {/* Mode Switcher */}
-          <div className="flex items-center gap-2" role="group" aria-label="Mode Switcher">
-            <Button
-              variant={currentMode === 'explanation' ? 'default' : 'outline'}
-              size="sm"
-              title="Explanation Mode"
-              onClick={() => handleModeButtonClick('explanation')}
-              className="gap-2 transition-colors"
-            >
-              <FileText className="h-4 w-4" />
-              Explanation
-            </Button>
-            <Button
-              variant={currentMode === 'quiz' ? 'default' : 'outline'}
-              size="sm"
-              title="Quiz Mode"
-              onClick={() => handleModeButtonClick('quiz')}
-              className="gap-2 transition-colors"
-            >
-              <HelpCircleIcon className="h-4 w-4" />
-              Quiz
-            </Button>
-            <Button
-              variant={currentMode === 'simulation' ? 'default' : 'outline'}
-              size="sm"
-              title="Simulation Mode"
-              onClick={() => handleModeButtonClick('simulation')}
-              className="gap-2 transition-colors"
-            >
-              <Play className="h-4 w-4" />
-              Simulate
-            </Button>
-          </div>
-
-          {/* Theme Toggle & Help */}
-          <div className="flex items-center gap-2">
+            
             <Button 
               variant="ghost" 
               size="sm"
@@ -134,14 +88,7 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
             >
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="gap-2 hover:bg-secondary transition-colors"
-            >
-              <HelpCircle className="h-4 w-4" />
-              Help
-            </Button>
+           
           </div>
         </div>
       </div>
