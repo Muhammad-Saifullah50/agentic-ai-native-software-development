@@ -19,7 +19,7 @@ const SimulationPanel: React.FC<SimulationPanelProps> = ({ onPlay, onPause, onSt
   }, []);
 
   return (
-    <Card className="shadow-lg border-border/50 bg-card animate-fade-in">
+    <Card className="shadow-lg border-border/50 bg-card animate-fade-in w-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold">Simulation Controls</CardTitle>
       </CardHeader>

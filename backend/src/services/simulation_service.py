@@ -3,14 +3,17 @@ import json
 from loguru import logger
 
 from agents import Runner
-from src.models.api import AgentNetworkArchitecture, SimulationEvent
+from src.models.api import AgentNetworkArchitecture, SimulationEvent, Connection
 from src.sim_agents.scenario_interpreter import scenario_interpreter_agent
 from src.sim_agents.architecture_planner import architecture_planner_agent
+from src.sim_agents.architecture_editor import architecture_editor_agent
 from src.sim_agents.failure_simulation import failure_simulation_agent
 from src.sim_agents.observability_narrative import observability_narrative_agent
 
 from src.models.gemini import config
 from src.websocket_manager import manager
+
+simulation_architectures = {}
 
 
 async def run_simulation(
@@ -78,6 +81,13 @@ async def run_simulation(
     )
 
     agent_network_architecture = architecture_result.final_output
+    simulation_architectures[simulation_id] = agent_network_architecture
+
+    for agent in agent_network_architecture.agents:
+        for tool_name in agent.tools:
+            agent_network_architecture.connections.append(
+                Connection(source=agent.id, target=tool_name, data_format="uses")
+            )
 
     ev = SimulationEvent(
         simulation_id=simulation_id,
@@ -182,3 +192,44 @@ async def run_simulation(
     logger.info(f"Simulation  results: {agent_network_architecture}")
 
     return agent_network_architecture
+
+
+async def edit_simulation(simulation_id: str, command: str) -> AgentNetworkArchitecture:
+    logger.info(f"Editing simulation {simulation_id} with command: {command}")
+
+    existing_architecture = simulation_architectures.get(simulation_id)
+    if not existing_architecture:
+        raise ValueError(f"Simulation with ID {simulation_id} not found.")
+
+    edit_input = f"""Existing architecture:
+{json.dumps(existing_architecture.model_dump(), indent=2)}
+
+Command: {command}
+"""
+
+    edit_result = await Runner.run(
+        starting_agent=architecture_editor_agent,
+        input=edit_input,
+        context="Edit the agent network architecture based on the command.",
+        run_config=config
+    )
+
+    new_architecture = edit_result.final_output
+    simulation_architectures[simulation_id] = new_architecture
+
+    for agent in new_architecture.agents:
+        for tool_name in agent.tools:
+            new_architecture.connections.append(
+                Connection(source=agent.id, target=tool_name, data_format="uses")
+            )
+
+    ev = SimulationEvent(
+        simulation_id=simulation_id,
+        timestamp=datetime.datetime.now().isoformat(),
+        event_type="architecture_edited",
+        payload={"agent_network_architecture": new_architecture}
+    )
+    await manager.broadcast(ev.model_dump_json())
+
+    logger.info(f"Simulation {simulation_id} edited successfully.")
+    return new_architecture

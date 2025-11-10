@@ -9,13 +9,6 @@
 /* Polar Night Palette: Deep Navy with Sophisticated Grays - Bold & Elegant */
 
 
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 :root {
   --background: oklch(1 0 0);
@@ -127,15 +120,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
 
 :root {
     /* Polar Night Primary Colors */
@@ -182,14 +166,6 @@
 html {
     scroll-behavior: smooth;
    
-}
-
- html {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    align-items: center;   /* vertical centering */
-    justify-content: center; /* horizontal centering */
 }
 
 /* Enhanced link styles */

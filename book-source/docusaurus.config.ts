@@ -49,17 +49,17 @@ const config: Config = {
     // See docs/ANALYTICS/ga4-setup.md for setup instructions
     ...(process.env.GA4_MEASUREMENT_ID
       ? [
-          {
-            tagName: "script",
-            attributes: {
-              async: "true",
-              src: `https://www.googletagmanager.com/gtag/js?id=${process.env.GA4_MEASUREMENT_ID}`,
-            },
+        {
+          tagName: "script",
+          attributes: {
+            async: "true",
+            src: `https://www.googletagmanager.com/gtag/js?id=${process.env.GA4_MEASUREMENT_ID}`,
           },
-          {
-            tagName: "script",
-            attributes: {},
-            innerHTML: `
+        },
+        {
+          tagName: "script",
+          attributes: {},
+          innerHTML: `
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
@@ -69,8 +69,8 @@ const config: Config = {
             'allow_ad_personalization_signals': false
           });
         `,
-          },
-        ]
+        },
+      ]
       : []),
   ],
 
@@ -94,8 +94,10 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          customCss: "./src/css/custom.css",
-        },
+          customCss: [
+          require.resolve("./src/css/custom.css"),
+          require.resolve("./src/css/tailwind.css"),
+        ]},
         // Sitemap configuration for search engines
         sitemap: {
           changefreq: "weekly",

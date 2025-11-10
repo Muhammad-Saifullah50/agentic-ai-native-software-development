@@ -1,4 +1,3 @@
-import '../css/custom.css';
 
 import { useEffect, useState } from 'react';
 import GraphEditToolbar from '@/components/GraphEditToolbar';
@@ -11,6 +10,7 @@ import TopBarControls from '@/components/TopBarControls';
 import SemanticCanvas from '@/components/SemanticCanvas';
 import { Node, Edge } from '@/types/graph';
 import { webSocketService } from '../services/websocketService';
+import { editWorkflow } from '../services/apiService';
 
 type PanelMode = 'explanation' | 'quiz' | 'simulation';
 
@@ -75,42 +75,23 @@ const Playground = () => {
     console.log('Redo clicked');
   };
 
-  const handleNaturalLanguageCommand = (command: string) => {
-    console.log('Natural Language Command:', command);
-  };
-
-  const handlePlaySimulation = () => {
-    setGlobalError(null);
-    if (simulationId) {
-      console.log('Play Simulation clicked for ID:', simulationId);
-      webSocketService.sendMessage({ type: 'PLAY', payload: { simulationId } });
-    } else {
-      setGlobalError('No simulation ID available to play. Please generate a workflow first.');
-      console.warn('No simulation ID to play.');
+  const handleNaturalLanguageCommand = async (command: string) => {
+    if (!simulationId) {
+      setGlobalError('Cannot edit workflow without a simulation ID.');
+      return;
+    }
+    try {
+      const { nodes: newNodes, edges: newEdges } = await editWorkflow(simulationId, command);
+      setNodes(newNodes);
+      setEdges(newEdges);
+    } catch (error: any) {
+      setGlobalError(error.message);
     }
   };
 
-  const handlePauseSimulation = () => {
-    setGlobalError(null);
-    if (simulationId) {
-      console.log('Pause Simulation clicked for ID:', simulationId);
-      webSocketService.sendMessage({ type: 'PAUSE', payload: { simulationId } });
-    } else {
-      setGlobalError('No simulation ID available to pause.');
-      console.warn('No simulation ID to pause.');
-    }
-  };
 
-  const handleStepSimulation = () => {
-    setGlobalError(null);
-    if (simulationId) {
-      console.log('Step Simulation clicked for ID:', simulationId);
-      webSocketService.sendMessage({ type: 'STEP', payload: { simulationId } });
-    } else {
-      setGlobalError('No simulation ID available to step.');
-      console.warn('No simulation ID to step.');
-    }
-  };
+  
+
 
   const handleResetSimulation = () => {
     setGlobalError(null);
@@ -218,11 +199,25 @@ const Playground = () => {
 
 
   return (
-    <div className="min-h-screen bg-background tw" >
+    <div id="tw" className="tw min-h-screen bg-background flex flex-col" >
       <TopBarControls onModeChange={setPanelMode} currentMode={panelMode} />
       
-      <div className="container mx-auto px-4 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="container mx-auto px-4 pb-8 flex-grow flex flex-col">
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
+          <div className="mb-4 lg:mb-0">
+            <GraphEditToolbar
+              onAddNode={() => console.log('Add node')}
+              onDeleteNode={() => console.log('Delete node')}
+              onAddConnection={() => console.log('Add connection')}
+              onRemoveConnection={() => console.log('Remove connection')}
+              onUndo={() => console.log('Undo')}
+              onRedo={() => console.log('Redo')}
+            />
+          </div>
+         
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Left Column - Input & Controls */}
           <div className="lg:col-span-1 space-y-6">
             <ScenarioInputPanel 
@@ -233,26 +228,10 @@ const Playground = () => {
             <NaturalLanguageEditBox 
               onNaturalLanguageCommand={handleNaturalLanguageCommand}
             />
-
-            <GraphEditToolbar
-              onAddNode={() => console.log('Add node')}
-              onDeleteNode={() => console.log('Delete node')}
-              onAddConnection={() => console.log('Add connection')}
-              onRemoveConnection={() => console.log('Remove connection')}
-              onUndo={() => console.log('Undo')}
-              onRedo={() => console.log('Redo')}
-            />
-
-            <SimulationPanel
-              onPlay={() => console.log('Play')}
-              onPause={() => console.log('Pause')}
-              onStep={() => console.log('Step')}
-              onReset={() => console.log('Reset')}
-            />
           </div>
 
-          {/* Middle Column - Semantic Canvas */}
-          <div className="lg:col-span-1">
+          {/* Right Column - Canvas */}
+          <div className="lg:col-span-2">
             <SemanticCanvas
               nodes={nodes}
               edges={edges}
@@ -260,25 +239,25 @@ const Playground = () => {
               onEdgeClick={handleEdgeClick}
             />
           </div>
+        </div>
 
-          {/* Right Column - Side Panel & Feedback */}
-          <div className="lg:col-span-1 space-y-6">
-            <ReflectionExplanationSidePanel
-              selectedElement={selectedElement}
-              mode={panelMode}
-            />
+        {/* Bottom Row - Side Panel & Feedback */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ReflectionExplanationSidePanel
+            selectedElement={selectedElement}
+            mode={panelMode}
+          />
 
-            <ScenarioFeedbackScoring
-              score={score}
-              violatedPrinciples={score !== null ? ['Insufficient error handling in perception layer'] : []}
-              missingComponents={score !== null ? ['Memory component for context retention'] : []}
-              suggestedImprovements={score !== null ? [
-                'Add validation layer before processing',
-                'Implement feedback loop for continuous learning'
-              ] : []}
-              summary={score !== null ? 'Good overall design with room for improvement in error handling and memory management.' : null}
-            />
-          </div>
+          <ScenarioFeedbackScoring
+            score={score}
+            violatedPrinciples={score !== null ? ['Insufficient error handling in perception layer'] : []}
+            missingComponents={score !== null ? ['Memory component for context retention'] : []}
+            suggestedImprovements={score !== null ? [
+              'Add validation layer before processing',
+              'Implement feedback loop for continuous learning'
+            ] : []}
+            summary={score !== null ? 'Good overall design with room for improvement in error handling and memory management.' : null}
+          />
         </div>
       </div>
     </div>

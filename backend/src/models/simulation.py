@@ -22,3 +22,6 @@ class SimulationRequest(BaseModel):
             ]
         }
     )
+
+class EditRequest(BaseModel):
+    command: str
