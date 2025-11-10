@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import GraphEditToolbar from '@/components/GraphEditToolbar';
 import NaturalLanguageEditBox from '@/components/NaturalLanguageEditBox';
 import ReflectionExplanationSidePanel from '@/components/ReflectionExplanationSidePanel';
@@ -11,6 +11,7 @@ import { Node, Edge } from '@/types/graph';
 import { webSocketService } from '../services/websocketService';
 import { editWorkflow, getAIFeedback } from '../services/apiService';
 import { v4 as uuidv4 } from 'uuid';
+import html2canvas from 'html2canvas'; // Import html2canvas
 
 type PanelMode = 'explanation' | 'quiz' | 'simulation';
 
@@ -29,6 +30,22 @@ const Playground = () => {
   const [suggestedImprovements, setSuggestedImprovements] = useState<string[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
   const [showFeedbackButton, setShowFeedbackButton] = useState(false);
+  const [isFeedbackLoading, setIsFeedbackLoading] = useState(false); // New state for loading feedback
+  const [isNLCommandLoading, setIsNLCommandLoading] = useState(false); // New state for NL command loading
+
+  // Undo/Redo history
+  const [history, setHistory] = useState<{ nodes: Node[]; edges: Edge[] }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  // Ref for the SemanticCanvas component to capture its content
+  const semanticCanvasRef = useRef<HTMLDivElement>(null);
+
+  // Helper to save state to history
+  const saveStateToHistory = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    setHistory([...newHistory, { nodes: newNodes, edges: newEdges }]);
+    setHistoryIndex(newHistory.length);
+  }, [history, historyIndex]);
 
   
   const handleWorkflowGenerated = (generatedNodes: Node[], generatedEdges: Edge[], newSimulationId: string) => {
@@ -42,6 +59,7 @@ const Playground = () => {
     setMissingComponents([]);
     setSuggestedImprovements([]);
     setSummary(null);
+    saveStateToHistory(generatedNodes, generatedEdges); // Save initial state
   };
 
   const handleNodeClick = (node: Node) => {
@@ -64,11 +82,35 @@ const Playground = () => {
         reflection_points: [],
       },
     };
-    setNodes((prevNodes) => [...prevNodes, newNode]);
+    const newNodes = [...nodes, newNode];
+    setNodes(newNodes);
+    saveStateToHistory(newNodes, edges);
   };
 
   const handleDeleteNode = () => {
-    console.log('Delete Node clicked');
+    if (selectedElement && 'type' in selectedElement && (selectedElement.type === 'agent' || selectedElement.type === 'tool')) {
+      const nodeIdToDelete = selectedElement.id;
+      const newNodes = nodes.filter((node) => node.id !== nodeIdToDelete);
+      const newEdges = edges.filter((edge) => edge.source !== nodeIdToDelete && edge.target !== nodeIdToDelete);
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setSelectedElement(null);
+      saveStateToHistory(newNodes, newEdges);
+    } else {
+      console.warn('No node selected for deletion or selected element is not a node.');
+    }
+  };
+
+  const handleRemoveConnection = () => {
+    if (selectedElement && !('type' in selectedElement)) { // Check if it's an edge (not a node)
+      const edgeIdToDelete = selectedElement.id;
+      const newEdges = edges.filter((edge) => edge.id !== edgeIdToDelete);
+      setEdges(newEdges);
+      setSelectedElement(null);
+      saveStateToHistory(nodes, newEdges);
+    } else {
+      console.warn('No edge selected for deletion or selected element is not an edge.');
+    }
   };
 
   const handleAddConnection = (connection: any) => { // Change type to any to access source and target
@@ -82,20 +124,30 @@ const Playground = () => {
         principle_reference: "",
       },
     };
-    setEdges((prevEdges) => [...prevEdges, newEdge]);
+    const newEdges = [...edges, newEdge];
+    setEdges(newEdges);
     setShowFeedbackButton(true);
-  };
-
-  const handleRemoveConnection = () => {
-    console.log('Remove Connection clicked');
+    saveStateToHistory(nodes, newEdges);
   };
 
   const handleUndo = () => {
-    console.log('Undo clicked');
+    if (historyIndex > 0) {
+      const prevIndex = historyIndex - 1;
+      const prevState = history[prevIndex];
+      setNodes(prevState.nodes);
+      setEdges(prevState.edges);
+      setHistoryIndex(prevIndex);
+    }
   };
 
   const handleRedo = () => {
-    console.log('Redo clicked');
+    if (historyIndex < history.length - 1) {
+      const nextIndex = historyIndex + 1;
+      const nextState = history[nextIndex];
+      setNodes(nextState.nodes);
+      setEdges(nextState.edges);
+      setHistoryIndex(nextIndex);
+    }
   };
 
   const handleGetAIFeedback = async () => {
@@ -103,15 +155,19 @@ const Playground = () => {
       setGlobalError('Cannot get AI feedback without a simulation ID.');
       return;
     }
+    setIsFeedbackLoading(true); // Set loading state to true
     try {
       const feedback = await getAIFeedback(simulationId, nodes, edges);
+      console.log('Received feedback:', feedback); // Add this line
       setScore(feedback.score);
-      setViolatedPrinciples(feedback.violatedPrinciples);
-      setMissingComponents(feedback.missingComponents);
-      setSuggestedImprovements(feedback.suggestedImprovements);
+      setViolatedPrinciples(feedback.violatedPrinciples || []); // Ensure it's an array
+      setMissingComponents(feedback.missingComponents || []); // Ensure it's an array
+      setSuggestedImprovements(feedback.suggestedImprovements || []); // Ensure it's an array
       setSummary(feedback.summary);
     } catch (error: any) {
       setGlobalError(error.message);
+    } finally {
+      setIsFeedbackLoading(false); // Set loading state to false
     }
   };
 
@@ -120,17 +176,49 @@ const Playground = () => {
       setGlobalError('Cannot edit workflow without a simulation ID.');
       return;
     }
+    setIsNLCommandLoading(true); // Set loading state to true
     try {
       const { nodes: newNodes, edges: newEdges } = await editWorkflow(simulationId, command);
       setNodes(newNodes);
       setEdges(newEdges);
+      saveStateToHistory(newNodes, newEdges); // Save state after NL command
     } catch (error: any) {
       setGlobalError(error.message);
+    } finally {
+      setIsNLCommandLoading(false); // Set loading state to false
     }
   };
 
+  const handleExportPng = async () => {
+    if (semanticCanvasRef.current) {
+      const canvas = await html2canvas(semanticCanvasRef.current);
+      const image = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = image;
+      a.download = 'workflow.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      console.log('Export as PNG clicked.');
+    } else {
+      console.warn('SemanticCanvas ref is not available for PNG export.');
+    }
+  };
 
-  
+  const handleExportJson = () => {
+    const data = { nodes, edges };
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'workflow.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log('Export as JSON clicked.');
+  };
 
 
   const handleResetSimulation = () => {
@@ -147,6 +235,8 @@ const Playground = () => {
       setMissingComponents([]);
       setSuggestedImprovements([]);
       setSummary(null);
+      setHistory([]); // Clear history on reset
+      setHistoryIndex(0);
     } else {
       setGlobalError('No simulation ID available to reset.');
       console.warn('No simulation ID to reset.');
@@ -213,9 +303,9 @@ const Playground = () => {
               id: `${connection.source}-${connection.target}`,
               source: connection.source,
               target: connection.target,
-              label: connection.data_format,
+              label: connection.label,
               metadata: {
-                explanation: connection.data_format,
+                explanation: connection.label,
                 principle_reference: "",
               },
             });
@@ -223,6 +313,7 @@ const Playground = () => {
 
           setNodes(newNodes);
           setEdges(newEdges);
+          saveStateToHistory(newNodes, newEdges); // Save initial state from WebSocket
         }
       });
 
@@ -235,25 +326,28 @@ const Playground = () => {
       webSocketService.disconnect();
       setGlobalError(null);
     }
-  }, [simulationId]);
+  }, [simulationId, saveStateToHistory]); // Add saveStateToHistory to dependencies
 
+  const isExportDisabled = nodes.length === 0;
 
   return (
     <div id="tw" className="tw min-h-screen bg-background flex flex-col" >
-      <TopBarControls onModeChange={setPanelMode} currentMode={panelMode} />
+      <TopBarControls
+        onModeChange={setPanelMode}
+        currentMode={panelMode}
+        onExportPng={handleExportPng}
+        onExportJson={handleExportJson}
+        isExportDisabled={isExportDisabled}
+      />
       
       <div className="container mx-auto px-4 pb-8 flex-grow flex flex-col">
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
           <div className="mb-4 lg:mb-0 w-full">
             <GraphEditToolbar
               onAddNode={handleAddNode}
-              onDeleteNode={() => console.log('Delete node')}
-              onAddConnection={handleAddConnection}
-              onRemoveConnection={() => console.log('Remove connection')}
-              onUndo={() => console.log('Undo')}
-              onRedo={() => console.log('Redo')}
-              onGetAIFeedback={handleGetAIFeedback}
-              isFeedbackDisabled={!showFeedbackButton}
+              onDeleteNode={handleDeleteNode}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
             />
           </div>
          
@@ -269,6 +363,7 @@ const Playground = () => {
             
             <NaturalLanguageEditBox 
               onNaturalLanguageCommand={handleNaturalLanguageCommand}
+              isNLCommandLoading={isNLCommandLoading}
             />
           </div>
 
@@ -280,6 +375,10 @@ const Playground = () => {
               onNodeClick={handleNodeClick}
               onEdgeClick={handleEdgeClick}
               onConnect={handleAddConnection}
+              onGetAIFeedback={handleGetAIFeedback}
+              isFeedbackDisabled={!showFeedbackButton}
+              isFeedbackLoading={isFeedbackLoading}
+              ref={semanticCanvasRef}
             />
           </div>
         </div>

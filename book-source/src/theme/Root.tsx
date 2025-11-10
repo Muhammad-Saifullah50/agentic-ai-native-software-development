@@ -10,11 +10,14 @@
 
 import React from 'react';
 import { AnalyticsTracker } from '@/components/AnalyticsTracker';
+import { ThemeProvider } from 'next-themes'; // Import ThemeProvider
 
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <AnalyticsTracker>
-      {children}
-    </AnalyticsTracker>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AnalyticsTracker>
+        {children}
+      </AnalyticsTracker>
+    </ThemeProvider>
   );
 }

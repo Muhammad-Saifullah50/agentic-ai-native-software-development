@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Link2, Unlink, Undo, Redo, Wand2 } from 'lucide-react';
+import { Plus, Trash2, Undo, Redo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import {
@@ -13,23 +13,15 @@ import AddNodeModal from './AddNodeModal';
 interface GraphEditToolbarProps {
   onAddNode: (type: 'agent' | 'tool', name: string) => void;
   onDeleteNode: () => void;
-  onAddConnection: () => void;
-  onRemoveConnection: () => void;
   onUndo: () => void;
   onRedo: () => void;
-  onGetAIFeedback: () => void;
-  isFeedbackDisabled: boolean;
 }
 
 const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
   onAddNode,
   onDeleteNode,
-  onAddConnection,
-  onRemoveConnection,
   onUndo,
   onRedo,
-  onGetAIFeedback,
-  isFeedbackDisabled,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nodeTypeToAdd, setNodeTypeToAdd] = useState<'agent' | 'tool'>('agent');
@@ -48,7 +40,7 @@ const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
 
   return (
     <>
-      <Card className="shadow-lg border-border/50 bg-card animate-fade-in">
+      <Card className="shadow-lg border-border/50 bg-card animate-fade-in w-full">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-semibold">Graph Edit Toolbar</CardTitle>
         </CardHeader>
@@ -60,7 +52,7 @@ const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
                   variant="outline"
                   size="sm"
                   title="Add Node"
-                  className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="gap-2 hover:bg-secondary hover:text-secondary-foreground transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   Add Node
@@ -80,30 +72,10 @@ const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
               size="sm"
               title="Delete Node"
               onClick={onDeleteNode}
-              className="gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+              className="gap-2 hover:bg-secondary hover:text-secondary-foreground transition-colors"
             >
               <Trash2 className="h-4 w-4" />
               Delete Node
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              title="Add Connection"
-              onClick={onAddConnection}
-              className="gap-2 hover:bg-info hover:text-info-foreground transition-colors"
-            >
-              <Link2 className="h-4 w-4" />
-              Add Connection
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              title="Remove Connection"
-              onClick={onRemoveConnection}
-              className="gap-2 hover:bg-warning hover:text-warning-foreground transition-colors"
-            >
-              <Unlink className="h-4 w-4" />
-              Remove Connection
             </Button>
             <Button
               variant="outline"
@@ -124,17 +96,6 @@ const GraphEditToolbar: React.FC<GraphEditToolbarProps> = ({
             >
               <Redo className="h-4 w-4" />
               Redo
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              title="Get AI Feedback"
-              onClick={onGetAIFeedback}
-              disabled={isFeedbackDisabled}
-              className="gap-2 hover:bg-success hover:text-success-foreground transition-colors"
-            >
-              <Wand2 className="h-4 w-4" />
-              Get AI Feedback
             </Button>
           </div>
         </CardContent>

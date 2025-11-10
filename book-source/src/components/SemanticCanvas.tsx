@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, forwardRef } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
+import { Wand2, Loader2 } from 'lucide-react'; // Import Wand2 and Loader2 icons
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { Button } from '@/components/ui/button'; // Import Button component
 
 
 // Type definitions
@@ -37,15 +38,21 @@ interface SemanticCanvasProps {
   onNodeClick?: (node: Node) => void;
   onEdgeClick?: (edge: Edge) => void;
   onConnect?: (connection: Edge) => void;
+  onGetAIFeedback: () => void; // New prop
+  isFeedbackDisabled: boolean; // New prop
+  isFeedbackLoading: boolean; // New prop
 }
 
-const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
+const SemanticCanvas = forwardRef<HTMLDivElement, SemanticCanvasProps>(({
   nodes = [],
   edges = [],
   onNodeClick,
   onEdgeClick,
   onConnect,
-}) => {
+  onGetAIFeedback, // Destructure new prop
+  isFeedbackDisabled, // Destructure new prop
+  isFeedbackLoading, // Destructure new prop
+}, ref) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const [rfNodes, setRfNodes] = useState([]);
@@ -231,9 +238,23 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
   }, [hideTooltip]);
 
   return (
-    <Card className="h-[600px] flex flex-col shadow-xl border-border/50 animate-fade-in">
-      <CardHeader className="border-b border-border/50">
+    <Card className="h-[600px] flex flex-col shadow-xl border-border/50 animate-fade-in" ref={ref}>
+      <CardHeader className="border-b border-border/50 flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-semibold">Workflow Canvas</CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onGetAIFeedback}
+          disabled={isFeedbackDisabled || isFeedbackLoading}
+          className="gap-2 hover:bg-secondary transition-colors"
+        >
+          {isFeedbackLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Wand2 className="h-4 w-4" />
+          )}
+          Get AI Feedback
+        </Button>
       </CardHeader>
       <CardContent className="flex-1 p-0" ref={wrapperRef}>
         {nodes.length === 0 ? (
@@ -244,13 +265,14 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Canvas Ready</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Canvas</h3>
               <p className="text-sm text-muted-foreground">Your workflow visualization will appear here</p>
             </div>
           </div>
         ) : (
           <div style={{ width: '100%', height: '100%' }}>
             <ReactFlow
+            
               nodes={rfNodes}
               edges={rfEdges}
               onNodesChange={onNodesChange}
@@ -263,14 +285,12 @@ const SemanticCanvas: React.FC<SemanticCanvasProps> = ({
               onEdgeMouseEnter={handleEdgeMouseEnter}
               onEdgeMouseLeave={handleEdgeMouseLeave}
               fitView
-              nodesDraggable={true}
-              nodesSelectable={true}
             />
           </div>
         )}
       </CardContent>
     </Card>
   );
-};
+});
 
 export default SemanticCanvas;

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Wand2 } from 'lucide-react';
+import { Wand2, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 interface NaturalLanguageEditBoxProps {
   onNaturalLanguageCommand: (command: string) => void;
+  isNLCommandLoading: boolean;
 }
 
-const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNaturalLanguageCommand }) => {
+const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNaturalLanguageCommand, isNLCommandLoading }) => {
   const [command, setCommand] = useState('');
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNatur
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (command.trim()) {
+    if (command.trim() && !isNLCommandLoading) {
       console.log('Natural language command submitted:', command);
       onNaturalLanguageCommand(command);
       setCommand('');
@@ -41,12 +42,18 @@ const NaturalLanguageEditBox: React.FC<NaturalLanguageEditBoxProps> = ({ onNatur
               value={command}
               onChange={(e) => setCommand(e.target.value)}
               className="flex-1 bg-background border-border focus:ring-2 focus:ring-primary"
+              disabled={isNLCommandLoading}
             />
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="gap-2 bg-primary hover:bg-primary/90 transition-colors"
+              disabled={isNLCommandLoading}
             >
-              <Wand2 className="h-4 w-4" />
+              {isNLCommandLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
               Apply
             </Button>
           </div>

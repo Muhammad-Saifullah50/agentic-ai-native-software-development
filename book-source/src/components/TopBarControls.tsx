@@ -14,9 +14,12 @@ type PanelMode = 'explanation' | 'quiz' | 'simulation';
 interface TopBarControlsProps {
   onModeChange: (mode: PanelMode) => void;
   currentMode: PanelMode;
+  onExportPng: () => void;
+  onExportJson: () => void;
+  isExportDisabled: boolean;
 }
 
-const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMode }) => {
+const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMode, onExportPng, onExportJson, isExportDisabled }) => {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -48,14 +51,6 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
             AI-Native Playground
           </h1>
 
-          {/* Navigation Links */}
-           
-           
-            
-           
-
-        
-
           {/* Theme Toggle & Help */}
           <div className="flex items-center gap-2">
              <DropdownMenu>
@@ -64,16 +59,17 @@ const TopBarControls: React.FC<TopBarControlsProps> = ({ onModeChange, currentMo
                   variant="ghost" 
                   size="sm"
                   className="gap-2 hover:bg-secondary transition-colors"
+                  disabled={isExportDisabled}
                 >
                   <FileDown className="h-4 w-4" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-popover border-border">
-                <DropdownMenuItem className="cursor-pointer hover:bg-secondary">
+                <DropdownMenuItem onClick={onExportPng} className="cursor-pointer hover:bg-secondary">
                   Export as PNG
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-secondary">
+                <DropdownMenuItem onClick={onExportJson} className="cursor-pointer hover:bg-secondary">
                   Export as JSON
                 </DropdownMenuItem>
               </DropdownMenuContent>
