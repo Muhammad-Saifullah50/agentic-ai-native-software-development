@@ -2,6 +2,13 @@
 
 const WS_BASE_URL = process.env.REACT_APP_BACKEND_WS_URL || 'ws://localhost:8000';
 
+interface SimulationEvent {
+  simulation_id: string;
+  timestamp: string;
+  event_type: string;
+  payload: any;
+}
+
 interface WebSocketMessage {
   type: string;
   payload: any;
@@ -10,7 +17,7 @@ interface WebSocketMessage {
 export class WebSocketService {
   private ws: WebSocket | null = null;
   private simulationId: string | null = null;
-  private messageHandlers: ((message: WebSocketMessage) => void)[] = [];
+  private messageHandlers: ((message: SimulationEvent) => void)[] = [];
   private errorHandler: ((error: Error) => void) | null = null;
 
   public connect(simulationId: string): Promise<void> {
@@ -33,7 +40,7 @@ export class WebSocketService {
 
       this.ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(event.data);
+          const message: SimulationEvent = JSON.parse(event.data);
           this.messageHandlers.forEach(handler => handler(message));
         } catch (error: any) {
           console.error('Error parsing WebSocket message:', error);
@@ -77,7 +84,7 @@ export class WebSocketService {
     }
   }
 
-  public onMessage(handler: (message: WebSocketMessage) => void): () => void {
+  public onMessage(handler: (message: SimulationEvent) => void): () => void {
     this.messageHandlers.push(handler);
     return () => {
       this.messageHandlers = this.messageHandlers.filter(h => h !== handler);

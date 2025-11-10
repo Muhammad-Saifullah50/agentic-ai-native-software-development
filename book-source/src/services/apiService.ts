@@ -31,7 +31,61 @@ export const simulateScenario = async (simulationId: string, scenarioText: strin
       throw new Error(errorData.detail || `Server error: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    const backendResponse = await response.json();
+
+    // Transform backend response (AgentNetworkArchitecture) to frontend SimulateResponse (nodes, edges)
+    const nodes: Node[] = [];
+    const edges: Edge[] = [];
+
+    // Map agents to nodes
+    backendResponse.agents.forEach((agent: any) => {
+      nodes.push({
+        id: agent.id,
+        type: "agent",
+        label: agent.name,
+        zone: "reasoning", // Default or infer if possible
+        metadata: {
+          description: agent.role,
+          principles: [], // Agent.dependencies are agent IDs, not principles. Initialize as empty.
+          reflection_points: [],
+        },
+      });
+    });
+
+    // Map tools to nodes
+    backendResponse.tools.forEach((tool: any) => {
+      nodes.push({
+        id: tool.name, // Assuming tool names are unique and can serve as IDs
+        type: "tool",
+        label: tool.name,
+        zone: "action", // Tools typically perform actions
+        metadata: {
+          description: tool.description,
+          principles: [],
+          reflection_points: [],
+        },
+      });
+    });
+
+    // Map connections to edges
+    backendResponse.connections.forEach((connection: any) => {
+      edges.push({
+        id: `${connection.source}-${connection.target}`, // Generate unique ID
+        source: connection.source,
+        target: connection.target,
+        label: connection.data_format,
+        metadata: {
+          explanation: connection.data_format,
+          principle_reference: "",
+        },
+      });
+    });
+
+    return {
+      nodes,
+      edges,
+      simulationId: backendResponse.simulation_id || simulationId, // Use backend's simulation_id if available, else frontend generated
+    };
   } catch (error: any) {
     console.error('Error simulating scenario:', error);
     if (error instanceof TypeError && error.message === 'Failed to fetch') {

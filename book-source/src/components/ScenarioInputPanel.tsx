@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { simulateScenario } from '@/services/apiService';
 
 interface ScenarioInputPanelProps {
   onWorkflowGenerated: (nodes: any[], edges: any[], simulationId: string) => void;
@@ -30,27 +31,17 @@ const ScenarioInputPanel: React.FC<ScenarioInputPanelProps> = ({ onWorkflowGener
 
     setIsLoading(true);
     try {
-      // Simulate API call - replace with actual implementation
-      const newSimulationId = `sim-${Date.now()}`;
-      // const response = await simulateScenario(newSimulationId, scenarioText, scenarioType);
-      // onWorkflowGenerated(response.nodes, response.edges, response.simulationId);
-      
-      // Mock response for demonstration
-      setTimeout(() => {
-        const mockNodes = [
-          { id: '1', label: 'Start Node', type: 'agent', zone: 'perception', metadata: { description: 'Entry point' } }
-        ];
-        const mockEdges: any[] = [];
-        onWorkflowGenerated(mockNodes, mockEdges, newSimulationId);
-        setIsLoading(false);
-      }, 1000);
+      const newSimulationId = `sim-${Date.now()}`
+; // Generate a new UUID for simulationId
+      const response = await simulateScenario(newSimulationId, scenarioText, scenarioType);
+      onWorkflowGenerated(response.nodes, response.edges, response.simulationId);
     } catch (error: any) {
       console.error('Failed to generate workflow:', error);
       setGlobalError(error.message || 'An unexpected error occurred during simulation.');
+    } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <Card className="shadow-lg border-border/50 bg-card animate-fade-in">
       <CardHeader className="pb-3">
