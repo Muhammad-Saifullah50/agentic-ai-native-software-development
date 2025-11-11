@@ -1,3 +1,9 @@
+[project]
+name = "agentic-ai-backend"
+version = "0.1.0"
+description = "AI-Native Scenario Simulator Backend"
+dependencies = []
+
 [tool.poetry]
 name = "backend"
 version = "0.1.0"
