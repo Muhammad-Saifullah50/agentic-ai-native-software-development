@@ -744,6 +744,7 @@ pre code {
         display: flex !important;
         align-items: center !important;
     }
+ 
 
     /* Interactive elements spacing - only for specific button types, not all links */
     button,
@@ -819,3 +820,4 @@ pre code {
    DOC PAGES STYLING - Premium enhancements for chapter pages
    ============================================================================ */
 @import "./doc-pages.css";
+

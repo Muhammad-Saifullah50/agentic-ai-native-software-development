@@ -173,6 +173,7 @@ const config: Config = {
 
     colorMode: {
       respectPrefersColorScheme: true,
+
     },
     docs: {
       sidebar: {
@@ -201,7 +202,7 @@ const config: Config = {
           position: 'right',
         },
         // {
-        //   href: "https://github.com/panaversity/ai-native-software-development",
+        //   to: "https://github.com/panaversity/ai-native-software-development",
         //   label: "GitHub",
         //   position: "right",
         // },
