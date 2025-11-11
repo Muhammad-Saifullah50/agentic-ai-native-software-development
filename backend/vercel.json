@@ -1,9 +1,23 @@
 {
   "version": 2,
   "builds": [
-    { "src": "src/main.py", "use": "@vercel/python" }
+    {
+      "src": "src/main.py",
+      "use": "@vercel/python"
+      
+    }
   ],
+  "functions": {
+    "src/main.py": {
+      "runtime": "python3.12"
+    }
+  },
   "routes": [
-    { "src": "/(.*)", "dest": "src/main.py" }
-  ]
+    {
+      "src": "/(.*)",
+      "dest": "src/main.py"
+    }
+  ],
+  "buildCommand": "poetry run vercel-build"
+
 }
