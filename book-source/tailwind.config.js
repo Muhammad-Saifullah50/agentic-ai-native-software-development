@@ -3,7 +3,6 @@ module.exports = {
     "./src/components/**/*.{js,jsx,ts,tsx}",
     "./src/pages/playground.tsx",
   ],
-  darkMode: ['class', '[data-theme="dark"]'],
  prefix: "",
   theme: {
     container: {

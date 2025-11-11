@@ -11,7 +11,8 @@ from src.error_handling import validation_exception_handler, generic_exception_h
 app = FastAPI()
 origins = [
     "https://agentic-ai-native-software-developm.vercel.app",
-    "http://localhost:3000",  # for local testing
+    "https://agentic-ai-native-software-developm-theta.vercel.app",
+    "http://localhost:3000",
 ]
 # Add CORS middleware
 app.add_middleware(
