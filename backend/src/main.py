@@ -9,11 +9,14 @@ from src.error_handling import validation_exception_handler, generic_exception_h
 
 
 app = FastAPI()
-
+origins = [
+    "https://agentic-ai-native-software-developm.vercel.app",
+    "http://localhost:3000",  # for local testing
+]
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=origins,  # Allows all origins
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
